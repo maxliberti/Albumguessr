@@ -8,8 +8,6 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-//getUserAlbums().then((data) => {console.log(data)});
-
 app.get("/api", async (req, res) => {
     try {
         let albums = await getUserAlbums()

@@ -53,6 +53,7 @@ async function getUserAlbums() {
     if (me) {
         let albums = await makeAlbumObj();
         if (albums) {
+                console.log(Object.keys(albums));
                 return albums;
         } else {
             console.log("No albums found!");
