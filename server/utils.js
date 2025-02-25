@@ -1,6 +1,6 @@
 require('dotenv').config();
-const fs = require('fs');
 const SpotifyWebApi = require('spotify-web-api-node')
+const fs = require('fs');
 const token = process.env.TOKEN
 const spotifyApi = new SpotifyWebApi();
 spotifyApi.setAccessToken(token);
@@ -18,6 +18,7 @@ async function getMyData() {
 async function makeAlbumObj() {
     const data = await spotifyApi.getMySavedAlbums()
     const album_response = data.body.items;
+    console.log(album_response);
 
     const albums = { };
 
@@ -45,15 +46,16 @@ async function makeAlbumObj() {
     }
 
     //console.log(albums['66at85wgO2pu5CccvqUF6i'][0]);
-    return albums;
+    let final_albums = {albums}
+    return final_albums;
 }
 
 async function getUserAlbums() {
     const me = await getMyData()
     if (me) {
         let albums = await makeAlbumObj();
+        console.log(albums);
         if (albums) {
-                console.log(Object.keys(albums));
                 return albums;
         } else {
             console.log("No albums found!");
