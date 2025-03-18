@@ -20,11 +20,10 @@ function App() {
     useEffect(() => {
         fetchAPI();
     }, [])
-;
 
     return (
         <div className="App">
-            <img src={spotifyLogo} className="spotify-logo" alt="Spotify" />
+            <img src={spotifyLogo} className="spotify-logo" alt="Spotify"/>
             <h1>Albumguessr</h1>
             {(Object.keys(albums).map(key => (
                 <div key={key}>

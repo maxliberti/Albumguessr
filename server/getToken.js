@@ -1,4 +1,6 @@
 require('dotenv').config();
+const fs = require('fs');
+const path = require('path');
 const SpotifyWebApi = require('spotify-web-api-node');
 const express = require('express');
 
@@ -34,6 +36,21 @@ const spotifyApi = new SpotifyWebApi({
 
 const app = express();
 
+const TOKEN_FILE = path.join(__dirname, 'tokens.json');
+
+let tokens = {}
+if (fs.existsSync(TOKEN_FILE)) {
+    tokens = JSON.parse(fs.readFileSync(TOKEN_FILE));
+    spotifyApi.setAccessToken(tokens.access_token);
+    spotifyApi.setRefreshToken(tokens.refresh_token);
+}
+
+const saveTokens = (access_token, refreshTokens) => {
+    tokens.access_token = access_token;
+    tokens.refresh_token = refreshTokens;
+    fs.writeFileSync(TOKEN_FILE, JSON.stringify(tokens));
+}
+
 app.get('/login', (req, res) => {
     res.redirect(spotifyApi.createAuthorizeURL(scopes));
 });
@@ -41,7 +58,6 @@ app.get('/login', (req, res) => {
 app.get('/callback', (req, res) => {
     const error = req.query.error;
     const code = req.query.code;
-    const state = req.query.state;
 
     if (error) {
         console.error('Callback Error:', error);
@@ -59,6 +75,8 @@ app.get('/callback', (req, res) => {
             spotifyApi.setAccessToken(access_token);
             spotifyApi.setRefreshToken(refresh_token);
 
+            saveTokens(access_token, refresh_token);
+
             console.log('access_token:', access_token);
             console.log('refresh_token:', refresh_token);
 
@@ -74,6 +92,7 @@ app.get('/callback', (req, res) => {
                 console.log('The access token has been refreshed!');
                 console.log('access_token:', access_token);
                 spotifyApi.setAccessToken(access_token);
+                saveTokens(access_token, refresh_token);
             }, expires_in / 2 * 1000);
         })
         .catch(error => {
