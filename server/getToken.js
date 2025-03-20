@@ -39,10 +39,12 @@ const app = express();
 const TOKEN_FILE = path.join(__dirname, 'tokens.json');
 
 let tokens = {}
+
+// if theres already tokens
 if (fs.existsSync(TOKEN_FILE)) {
     tokens = JSON.parse(fs.readFileSync(TOKEN_FILE));
     spotifyApi.setAccessToken(tokens.access_token);
-    spotifyApi.setRefreshToken(tokens.refresh_token);
+spotifyApi.setRefreshToken(tokens.refresh_token);
 }
 
 const saveTokens = (access_token, refreshTokens) => {
@@ -92,6 +94,7 @@ app.get('/callback', (req, res) => {
                 console.log('The access token has been refreshed!');
                 console.log('access_token:', access_token);
                 spotifyApi.setAccessToken(access_token);
+                // save tokens to file
                 saveTokens(access_token, refresh_token);
             }, expires_in / 2 * 1000);
         })

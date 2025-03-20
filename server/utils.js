@@ -1,10 +1,29 @@
 require('dotenv').config();
 const SpotifyWebApi = require('spotify-web-api-node')
 const fs = require('fs');
-const token = process.env.TOKEN
-const spotifyApi = new SpotifyWebApi();
-spotifyApi.setAccessToken(token);
+const path = require('path');
 
+// get token file
+const TOKEN_FILE = path.join(__dirname, 'tokens.json');
+
+// put them into object
+let tokens = {}
+if (fs.existsSync(TOKEN_FILE)) {
+    tokens = JSON.parse(fs.readFileSync(TOKEN_FILE));
+}
+
+const spotifyApi = new SpotifyWebApi({
+    clientId: process.env.CLIENT_ID,
+    clientSecret: process.env.CLIENT_SECRET,
+});
+
+// set access token from the file
+if (tokens.access_token) {
+    spotifyApi.setAccessToken(tokens.access_token);
+} else {
+    console.error('No access token');
+    process.exit(1);
+}
 
 async function getMyData() {
     try {
